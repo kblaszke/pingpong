@@ -1,9 +1,13 @@
 package pl.blaszak.spring.activemq;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.broker.BrokerService;
 
-import javax.jms.*;
+import javax.jms.Connection;
+import javax.jms.DeliveryMode;
+import javax.jms.Destination;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
 
 /**
  * Created by SG0945943 on 2017-04-03.
@@ -11,10 +15,10 @@ import javax.jms.*;
 public class ActiveMqSenderBuilder {
 
     private int ackMode = Session.AUTO_ACKNOWLEDGE;
-    private String messageQueueName;
+    private String topicName;
     private String messageBrokerUrl;
     private boolean transacted = false;
-    private int deliveryMode = DeliveryMode.NON_PERSISTENT;
+    private final int deliveryMode = DeliveryMode.NON_PERSISTENT;
     private ActiveMqListener listener;
 
     public ActiveMqSenderBuilder withAckMode(int ackMode) {
@@ -22,8 +26,8 @@ public class ActiveMqSenderBuilder {
         return this;
     }
 
-    public ActiveMqSenderBuilder withMessageQueueName(String messageQueueName) {
-        this.messageQueueName = messageQueueName;
+    public ActiveMqSenderBuilder withTopicName(String sendingQueueName) {
+        this.topicName = sendingQueueName;
         return this;
     }
 
@@ -45,19 +49,15 @@ public class ActiveMqSenderBuilder {
     public ActiveMqSender build() {
 
         try {
-            BrokerService broker = new BrokerService();
-            broker.setPersistent(false);
-            broker.setUseJmx(false);
-            broker.addConnector(messageBrokerUrl);
-            broker.start();
             ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(messageBrokerUrl);
             Connection connection = connectionFactory.createConnection();
             connection.start();
             Session session = connection.createSession(transacted, ackMode);
-            Destination destination = session.createQueue(messageQueueName);
-            MessageProducer producer = session.createProducer(destination);
+            Destination sendingDestination = session.createTopic(topicName);
+            MessageProducer producer = session.createProducer(sendingDestination);
             producer.setDeliveryMode(deliveryMode);
-            MessageConsumer consumer = session.createConsumer(destination);
+            // Destination receivingDestination = session.createQueue(receivingQueueName);
+            MessageConsumer consumer = session.createConsumer(sendingDestination);
             consumer.setMessageListener(listener);
             return new ActiveMqSender(producer, session);
         } catch (Exception e) {

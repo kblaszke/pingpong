@@ -1,7 +1,7 @@
 package pl.blaszak.spring.activemq;
 
 import pl.blaszak.spring.activemq.exception.ActiveMqException;
-import pl.blaszak.spring.pingpong.model.PingPongEvent;
+import pl.blaszak.spring.activemq.model.PingPongEvent;
 
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
@@ -13,9 +13,9 @@ import javax.jms.Session;
  */
 public class ActiveMqSender {
 
-    public static final String MESSAGE_ERROR = "Can not send the event: ";
-    private MessageProducer producer;
-    private Session session;
+    private static final String MESSAGE_ERROR = "Can not send the event: ";
+    private final MessageProducer producer;
+    private final Session session;
 
     ActiveMqSender(MessageProducer producer, Session session) {
         this.producer = producer;

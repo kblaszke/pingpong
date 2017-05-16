@@ -1,4 +1,4 @@
-package pl.blaszak.spring.pingpong.model;
+package pl.blaszak.spring.activemq.model;
 
 import java.io.Serializable;
 
@@ -9,8 +9,10 @@ public class PingPongEvent implements Serializable {
 
     private final String eventId;
     private final int counter;
+    private final String sender;
 
-    public PingPongEvent(String eventId, int counter) {
+    public PingPongEvent(String sender, String eventId, int counter) {
+        this.sender = sender;
         this.eventId = eventId;
         this.counter = counter;
     }
@@ -21,5 +23,9 @@ public class PingPongEvent implements Serializable {
 
     public int getCounter() {
         return counter;
+    }
+
+    public String getSender() {
+        return sender;
     }
 }

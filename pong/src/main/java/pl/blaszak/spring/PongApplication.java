@@ -14,14 +14,15 @@ public class PongApplication {
 
     @Bean
     public PingListener getPingListener() {
-        return new PingListener();
+        String appName = "PongApplication";
+        return new PingListener(appName);
     }
 
     @Bean
     public ActiveMqSender getPongSender(PingListener pongListener) {
         ActiveMqSender sender = new ActiveMqSenderBuilder()
                 .withMessageBrokerUrl("tcp://localhost:61616")
-                .withMessageQueueName("pingpong")
+                .withTopicName("pingPongTopic")
                 .withListener(pongListener)
                 .build();
         pongListener.setSender(sender);
